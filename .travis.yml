@@ -1,0 +1,21 @@
+language: c
+
+env:
+  global:
+    - GCC_BUILD_DIR="build-gcc"
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+  - osx
+
+before_script:
+  - git clone https://github.com/thvnx/gcc.git --branch accurate-limited-range
+  - mkdir $GCC_BUILD_DIR
+  - cd $GCC_BUILD_DIR && ../gcc/configure && make -j8
+
+script:
+  - echo OK
