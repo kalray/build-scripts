@@ -11,12 +11,10 @@ os:
   - linux
 
 install:
-  - sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev
+  - sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev texinfo zlib1g-dev
 
 before_script:
-  - git clone --depth 1 https://github.com/thvnx/gcc.git --branch accurate-limited-range
-  - mkdir $GCC_BUILD_DIR
-  - cd $GCC_BUILD_DIR && ../gcc/configure --disable-multilib && make -j8
+  - ./build-k1-xgcc.sh test-build
 
 script:
   - echo OK
