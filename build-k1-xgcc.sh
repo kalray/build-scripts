@@ -4,9 +4,9 @@ set -eu
 DOWNLOAD_REQ=1
 
 ## Set these for using specific revision
-SHA1_GCC=3130e1ac4928043ca6572804065955a900795c67
-SHA1_GDB=fe938e201ac54619a188fa92959bf0c41eff10f5
-SHA1_NEWLIB=bfac2db4903b666c4595ccfa74e5f4c8af685873
+SHA1_GCC=${SHA1_GCC:-HEAD}
+SHA1_GDB=${SHA1_GDB:-HEAD}
+SHA1_NEWLIB=${SHA1_NEWLIB:-HEAD}
 
 TARGET=k1-elf
 PREFIX=$(realpath $1)
@@ -17,29 +17,32 @@ PARALLEL_JOBS=-j6
 mkdir -p $PREFIX
 export PATH=$PREFIX/bin:$PATH
 
-git clone --depth 1 -b coolidge https://github.com/kalray/gdb-binutils.git
-if [[ ! -z "$SHA1_GDB" ]]
-then
-   cd gdb-binutils
-   git reset --hard $SHA1_GDB
-   cd -
-fi
+function git_clone() {
+    local repo=$1
+    local sha1=$2
 
-git clone --depth 1 -b coolidge https://github.com/kalray/newlib.git
-if [[ ! -z "$SHA1_NEWLIB" ]]
-then
-   cd newlib
-   git reset --hard $SHA1_NEWLIB
-   cd -
-fi
+    repo_dir=$(basename ${repo} ".git")
+    echo "Cloning ${repo} (${repo_dir}) sha1: ${sha1}"
+    if [ -d ${repo_dir} ]; then
+	cd ${repo_dir}
+	git fetch
+	cd -
+    else
+	git clone --depth 1 -b coolidge ${repo}
+    fi
 
-git clone --depth 1 -b coolidge https://github.com/kalray/gcc.git
-if [[ ! -z "$SHA1_GCC" ]]
-then
-   cd gcc
-   git reset --hard $SHA1_GCC
-   cd -
-fi
+    if [[ ! -z "${sha1}" ]]
+    then
+	cd ${repo_dir}
+	git reset --hard ${sha1}
+	cd -
+    fi
+}
+
+git_clone https://github.com/kalray/gdb-binutils.git ${SHA1_GDB}
+git_clone https://github.com/kalray/newlib.git ${SHA1_NEWLIB}
+git_clone https://github.com/kalray/gcc.git ${SHA1_GCC}
+
 
 mkdir build-binutils
 cd build-binutils
