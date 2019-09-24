@@ -44,7 +44,7 @@ git_clone https://github.com/kalray/newlib.git ${SHA1_NEWLIB}
 git_clone https://github.com/kalray/gcc.git ${SHA1_GCC}
 
 
-mkdir build-binutils
+mkdir -p build-binutils
 cd build-binutils
 ../gdb-binutils/configure --prefix=$PREFIX --target=$TARGET --disable-initfini-array  --disable-gdb --without-gdb --disable-werror   --with-expat=yes --with-babeltrace=no --with-bugurl=no
 make all $PARALLEL_JOBS
@@ -56,7 +56,7 @@ cd gcc
 ./contrib/download_prerequisites
 
 cd -
-mkdir build-gcc
+mkdir -p build-gcc
 cd build-gcc
 ../gcc/configure --prefix=$PREFIX --target=$TARGET  --with-gnu-as --with-gnu-ld --disable-bootstrap --disable-shared --enable-multilib --disable-libmudflap --disable-libssp --enable-__cxa_atexit --with-bugurl=no --with-newlib                      --disable-libgomp --disable-libatomic --disable-threads --enable-languages=c --with-system-zlib
 
@@ -64,7 +64,7 @@ make all-gcc $PARALLEL_JOBS
 make install-gcc
 
 cd -
-mkdir build-newlib
+mkdir -p build-newlib
 cd  build-newlib
 ../newlib/configure --target=$TARGET --prefix=$PREFIX \
             --enable-multilib \
