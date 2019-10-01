@@ -2,4 +2,4 @@
 # Source this file before executing build-k1-xgcc.sh to build code drop 4.0.0-cd4
 export SHA1_GCC=3130e1ac4928043ca6572804065955a900795c67
 export SHA1_GDB=fe938e201ac54619a188fa92959bf0c41eff10f5
-export SHA1_NEWLIB=bfac2db4903b666c4595ccfa74e5f4c8af685873
+export SHA1_NEWLIB=28980fd977bc0b006469dd24839b67b83f579874
