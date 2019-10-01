@@ -16,7 +16,7 @@ To build elf toolchain for this code drop 4:
 source ./4.0.0-cd4.refs
 ./build-scripts/build-k1-xgcc.sh <prefix>
 ```
-<prefix> is the path where toolchian will be installed.
+Prefix is the path where toolchian will be installed.
 
 
 
