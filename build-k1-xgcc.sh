@@ -58,7 +58,7 @@ cd gcc
 cd -
 mkdir -p build-gcc
 cd build-gcc
-../gcc/configure --prefix=$PREFIX --target=$TARGET  --with-gnu-as --with-gnu-ld --disable-bootstrap --disable-shared --enable-multilib --disable-libmudflap --disable-libssp --enable-__cxa_atexit --with-bugurl=no --with-newlib                      --disable-libgomp --disable-libatomic --disable-threads --enable-languages=c --with-system-zlib
+../gcc/configure --prefix=$PREFIX --target=$TARGET  --with-gnu-as --with-gnu-ld --disable-bootstrap --disable-shared --enable-multilib --disable-libmudflap --disable-libssp --enable-__cxa_atexit --with-bugurl=no --with-newlib                      --disable-libgomp --disable-libatomic --disable-threads --enable-languages=c,c++ --with-system-zlib
 
 make all-gcc $PARALLEL_JOBS
 make install-gcc
