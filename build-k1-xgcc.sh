@@ -13,6 +13,7 @@ PREFIX=$(realpath $1)
 
 PARALLEL_JOBS=-j6
 
+# Used to redirect some output
 
 mkdir -p $PREFIX
 export PATH=$PREFIX/bin:$PATH
@@ -43,21 +44,47 @@ fi
 
 mkdir build-binutils
 cd build-binutils
-../gdb-binutils/configure --prefix=$PREFIX --target=$TARGET --disable-initfini-array  --disable-gdb --without-gdb --disable-werror   --with-expat=yes --with-babeltrace=no --with-bugurl=no
-make all $PARALLEL_JOBS
+../gdb-binutils/configure \
+    --prefix=$PREFIX \
+    --target=$TARGET \
+    --disable-initfini-array  \
+    --disable-gdb \
+    --without-gdb \
+    --disable-werror   \
+    --with-expat=yes \
+    --with-babeltrace=no \
+    --with-bugurl=no
+
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 cd -
 cd gcc
 
-./contrib/download_prerequisites
+##./contrib/download_prerequisites
 
 cd -
 mkdir build-gcc
 cd build-gcc
-../gcc/configure --prefix=$PREFIX --target=$TARGET  --with-gnu-as --with-gnu-ld --disable-bootstrap --disable-shared --enable-multilib --disable-libmudflap --disable-libssp --enable-__cxa_atexit --with-bugurl=no --with-newlib                      --disable-libgomp --disable-libatomic --disable-threads --enable-languages=c --with-system-zlib
+../gcc/configure --prefix=$PREFIX \
+		 --target=$TARGET \
+		 --with-gnu-as \
+		 --with-gnu-ld \
+		 --disable-bootstrap \
+		 --disable-shared \
+		 --enable-multilib \
+		 --disable-libmudflap \
+		 --disable-libssp \
+		 --enable-__cxa_atexit \
+		 --with-bugurl=no \
+		 --with-newlib                      \
+		 --disable-libgomp \
+		 --disable-libatomic \
+		 --disable-threads \
+		 --enable-languages=c \
+		 --with-system-zlib
 
-make all-gcc $PARALLEL_JOBS
+make all-gcc $PARALLEL_JOBS > /dev/null
 make install-gcc
 
 cd -
@@ -70,12 +97,12 @@ cd  build-newlib
             --target=${TARGET} \
 	    --enable-newlib-multithread
 
-make all $PARALLEL_JOBS
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 cd -
 cd build-gcc
-make all $PARALLEL_JOBS
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 echo "Finished"
