@@ -46,39 +46,69 @@ git_clone https://github.com/kalray/gcc.git ${SHA1_GCC}
 
 mkdir -p build-binutils
 cd build-binutils
-../gdb-binutils/configure --prefix=$PREFIX --target=$TARGET --disable-initfini-array  --disable-gdb --without-gdb --disable-werror   --with-expat=yes --with-babeltrace=no --with-bugurl=no
-make all $PARALLEL_JOBS
+../gdb-binutils/configure \
+    --prefix=$PREFIX \
+    --target=$TARGET \
+    --disable-initfini-array  \
+    --disable-gdb \
+    --without-gdb \
+    --disable-werror   \
+    --with-expat=yes \
+    --with-babeltrace=no \
+    --with-bugurl=no
+
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 cd -
 cd gcc
 
-./contrib/download_prerequisites
+## This is used only when distribution does not have correct dependencies.
+##./contrib/download_prerequisites
 
 cd -
 mkdir -p build-gcc
 cd build-gcc
-../gcc/configure --prefix=$PREFIX --target=$TARGET  --with-gnu-as --with-gnu-ld --disable-bootstrap --disable-shared --enable-multilib --disable-libmudflap --disable-libssp --enable-__cxa_atexit --with-bugurl=no --with-newlib                      --disable-libgomp --disable-libatomic --disable-threads --enable-languages=c,c++ --with-system-zlib
+../gcc/configure \
+    --prefix=$PREFIX \
+    --target=$TARGET  \
+    --with-gnu-as \
+    --with-gnu-ld \
+    --disable-bootstrap \
+    --disable-shared \
+    --enable-multilib \
+    --disable-libmudflap \
+    --disable-libssp \
+    --enable-__cxa_atexit \
+    --with-bugurl=no \
+    --with-newlib                      \
+    --disable-libgomp \
+    --disable-libatomic \
+    --disable-threads \
+    --enable-languages=c,c++ \
+    --with-system-zlib
 
-make all-gcc $PARALLEL_JOBS
+make all-gcc $PARALLEL_JOBS > /dev/null
 make install-gcc
 
 cd -
 mkdir -p build-newlib
 cd  build-newlib
-../newlib/configure --target=$TARGET --prefix=$PREFIX \
-            --enable-multilib \
-            --enable-target-optspace \
-            --enable-newlib-io-c99-formats \
-            --target=${TARGET} \
-	    --enable-newlib-multithread
+../newlib/configure \
+    --target=$TARGET \
+    --prefix=$PREFIX \
+    --enable-multilib \
+    --enable-target-optspace \
+    --enable-newlib-io-c99-formats \
+    --target=${TARGET} \
+    --enable-newlib-multithread
 
-make all $PARALLEL_JOBS
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 cd -
 cd build-gcc
-make all $PARALLEL_JOBS
+make all $PARALLEL_JOBS > /dev/null
 make install
 
 echo "Finished"
