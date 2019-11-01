@@ -230,7 +230,7 @@ index 61eda97..13df055 100644
 
 ## Boot sequence
 
-RM core in each cluster is normally dedicated to firmware: management of L2 cache, hyperviseur, etc...
+RM core in each cluster is normally dedicated to firmware: management of L2 cache, hypervisor, etc...
 So boot is done on RM to initialize cluster memory mapped registers for L2 cache, APIC, GIC and MAILBOX.
 
 **RM boot sequence**:
