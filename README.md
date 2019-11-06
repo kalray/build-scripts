@@ -2,7 +2,7 @@
 
 # Welcome to OS porting guide
 
-This guide should give you some information about porting newlib, gcc/binutils and gdb to make new OS aware toolchain.
+This guide should give you some information about porting newlib, gdb/binutils and gcc to make new OS aware toolchain.
 
 ## How to build existing elf (bare) toolchain
 
