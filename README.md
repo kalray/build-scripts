@@ -15,7 +15,7 @@ For example: You will get SHA1 references of GCC, gdb/binutils and newlib for of
 
 To build elf toolchain for this version:
 
-```
+```bash
 source ./4.0.0-cd5.refs
 ./build-scripts/build-k1-xgcc.sh <prefix>
 ```
@@ -48,7 +48,7 @@ This component is necessary to generate binaries but should not be modified for 
 You have only to modify the config.sub in case of unkown OS.
 Example with FreeRTOS:
 
-```
+```diff
 git diff
 diff --git a/config.sub b/config.sub
 index 5a728e8..bc919fa 100755
@@ -91,7 +91,7 @@ Files that configure gcc's driver for elf toolchain:
 
 These files are used in gcc/config.gcc:
 
-```
+```bash
 k1-*-elf*)
 	tm_file="${tm_file} elfos.h dbxelf.h k1/k1-elf.h newlib-stdint.h"
 	tmake_file="k1/t-k1 k1/t-elf"
@@ -100,7 +100,7 @@ k1-*-elf*)
 
 Example of targetting for FreeRTOS:
 - add your OS in config.sub if not yet supported in gcc. Example with FreeRTOS:
-```
+```diff
 git diff ./config.sub
 diff --git a/config.sub b/config.sub
 index 7fabc3d..70595a5 100755
@@ -117,7 +117,7 @@ index 7fabc3d..70595a5 100755
         -qnx*)
 ```
 - create k1-freertos.h from k1-elf.h. For FreeRTOS:
-```
+```c
 cat gcc/config/k1/k1-freertos.h
 /* Machine description for K1 MPPA architecture.
    Copyright (C) 2018 Kalray Inc.
@@ -169,7 +169,7 @@ MULTILIB_OPTIONS = fno-exceptions
 MULTILIB_DIRNAMES = noexceptions
 ```
 - add configuration line in gcc/config.gcc for freeRTOS:
-```
+```bash
 k1-*-freertos*)
 	tm_file="${tm_file} elfos.h dbxelf.h k1/k1-freertos.h newlib-stdint.h"
 	tmake_file="k1/t-k1 k1/t-freertos"
@@ -186,7 +186,7 @@ It contains support for:
 
 Basic startup point for FreeRTOS port is:
 - Modify newlib/config.sub to add FreeRTOS:
-```
+```diff
 git diff ./config.sub
 diff --git a/config.sub b/config.sub
 index 7c526fb..54ab48d 100755
@@ -206,7 +206,7 @@ index 7c526fb..54ab48d 100755
  - copy all libgloss/k1-elf directory to libgloss/k1-freertos
  - Defines k1-freertos in libgloss/configure.in:
 
-```
+```diff
 git diff ./configure.in
 diff --git a/libgloss/configure.in b/libgloss/configure.in
 index 61eda97..13df055 100644
@@ -234,9 +234,9 @@ RM core in each cluster is normally dedicated to firmware: management of L2 cach
 So boot is done on RM to initialize cluster memory mapped registers for L2 cache, APIC, GIC and MAILBOX.
 
 **RM boot sequence**:
-- start.S: _start: core 64 bits mode, setting of the stack pointer and call of __k1_rm_c_startup
-- boot_c.c: __k1_rm_c_startup: 
-```
+- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__k1_rm_c_startup`
+- boot_c.c: `__k1_rm_c_startup`: 
+```c
 void __k1_rm_c_startup(void)
 {
   __k1_low_level_startup();
@@ -245,7 +245,7 @@ void __k1_rm_c_startup(void)
   __k1_stop();
 }
 ```
-- boot_c.c: __k1_low_level_startup
+- boot_c.c: `__k1_low_level_startup`
   - init of exception vector (SFR:EV)
   - enable icache, dcache, streaming load, hardware loop
   - init of interupts, DAME (Data Asynchronous Memory Error)
@@ -253,27 +253,27 @@ void __k1_rm_c_startup(void)
   - enable L1 cache coherency
   - init of power controller
 
-- boot_c.c: __k1_rm_init
+- boot_c.c: `__k1_rm_init`
   - TLS and BSS sections init
 
-- boot_c.c: __k1_do_rm_startup
-  - call of __k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)
+- boot_c.c: `__k1_do_rm_startup`
+  - call of `__k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)`
 
-- boot_c.c: __k1_start_pe
-  - init of _K1_PE_START_ADDRESS: address of startup routine to call at boot time
-  - init of _K1_PE_ARGS_ADDRESS: address of k1_boot_args_t structure to pass argc, argv and envp
-  - init of _K1_PE_STACK_ADDRESS: PE0 stack start address
+- boot_c.c: `__k1_start_pe`
+  - init of `_K1_PE_START_ADDRESS`: address of startup routine to call at boot time
+  - init of `_K1_PE_ARGS_ADDRESS`: address of `k1_boot_args_t` structure to pass `argc`, `argv` and `envp`
+  - init of `_K1_PE_STACK_ADDRESS`: PE0 stack start address
   - wakeup PE0 using power controller
 
-- boot_c.c: __k1_stop
+- boot_c.c: `__k1_stop`
   - set RM in IDLE mode
 
 **PE0 boot sequence**:
 
-- start.S: _start: core 64 bits mode, setting of the stack pointer and call of __k1_pe_libc_start previously given during RM boot.
+- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__k1_pe_libc_start` previously given during RM boot.
 
-- boot_c.c: __k1_pe_c_startup: 
-```
+- boot_c.c: `__k1_pe_c_startup`: 
+```c
 void __k1_pe_c_startup(void)
 {
   __k1_low_level_startup();
@@ -281,31 +281,31 @@ void __k1_pe_c_startup(void)
   __k1_stop();
 }
 ```
-- boot_c.c: __k1_low_level_startup
+- boot_c.c: `__k1_low_level_startup`
   - init of exception vector (SFR:EV)
   - enable icache, dcache, streaming load, hardware loop
   - init of interupts, DAME (Data Asynchronous Memory Error)
   - enable L1 cache coherency
   - init of power controller
 
-- boot_c.c: __k1_do_pe_startup
-  - __k1_pe_init: init of sections TLS and BSS
-  - __k1_finish_newlib_init: some libc internal init for reentrance
-  - register __k1_newlib_flushall at exit to flush mainly IO streams at exit.
+- boot_c.c: `__k1_do_pe_startup`
+  - `__k1_pe_init`: init of sections TLS and BSS
+  - `__k1_finish_newlib_init`: some libc internal init for reentrance
+  - register `__k1_newlib_flushall` at exit to flush mainly IO streams at exit.
   - call main routine
   - call exit
   - while(1)
 
-- boot_c.c: __k1_do_rm_startup
-  - call of __k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)
+- boot_c.c: `__k1_do_rm_startup`
+  - call of `__k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)`
 
-- boot_c.c: __k1_start_pe
-  - init of _K1_PE_START_ADDRESS: address of startup routine to call at boot time
-  - init of _K1_PE_ARGS_ADDRESS: address of k1_boot_args_t structure to pass argc, argv and envp
-  - init of _K1_PE_STACK_ADDRESS: PE0 stack start address
+- boot_c.c: `__k1_start_pe`
+  - init of `_K1_PE_START_ADDRESS`: address of startup routine to call at boot time
+  - init of `_K1_PE_ARGS_ADDRESS`: address of k1_boot_args_t structure to pass argc, argv and envp
+  - init of `_K1_PE_STACK_ADDRESS`: PE0 stack start address
   - wakeup PE0 using power controller
 
-- boot_c.c: __k1_stop
+- boot_c.c: `__k1_stop`
   - set RM in IDLE mode
 
 ## Exceptions handling
@@ -316,9 +316,9 @@ K1 core has an Exception Vector register to initialize with a vector of 4 trampo
 - INTERRUPT
 - SYSCALL
 
-At boot time, SFR[EV] is initialized to K1_EXCEPTION_ADDRESS initialized by default in bare.ld linker script:
+At boot time, `SFR[EV]` is initialized to `K1_EXCEPTION_ADDRESS` initialized by default in bare.ld linker script:
 
-```
+```c
 K1_EXCEPTION_ADDRESS = DEFINED(K1_EXCEPTION_ADDRESS) ? K1_EXCEPTION_ADDRESS : 0x400;
 K1_DEBUG_ADDRESS     = K1_EXCEPTION_ADDRESS + 0x00;
 K1_TRAP_ADDRESS      = K1_EXCEPTION_ADDRESS + 0x40;
@@ -327,7 +327,7 @@ K1_SYSCALL_ADDRESS   = K1_EXCEPTION_ADDRESS + 0xc0;
 ```
 Each address is used to init specific sections address in bare.ld linker script:
 
-```
+```c
   .exception.debug K1_DEBUG_ADDRESS : {
     /* The debug exception handler */
     KEEP(*(.exception.debug))
@@ -386,26 +386,26 @@ k1c_syscall_handler_trampoline:
 	.endp k1c_syscall_handler_trampoline
 ```
 
-- exceptions.S: __k1_asm_exceptions_handler
+- exceptions.S: `__k1_asm_exceptions_handler`
   - Save context
   - Call corresponding exception handler depending on SFR[EC] (Exception Cause)
-  - Each exception handler call corresponding __k1_do_<exception type>
+  - Each exception handler call corresponding `__k1_do_<exception type>`
   - Restore context
 
-- handlers.c: __k1_do_hwtrap
+- handlers.c: `__k1_do_hwtrap`
   - if write is defined, print error message and exit with 1 as error code
   - cluster power off
 
-- handlers.c: __k1_do_interrupt
-  - if __k1_int_handlers[<it number>] is registered, call it
+- handlers.c: `__k1_do_interrupt`
+  - if `__k1_int_handlers[<it number>]` is registered, call it
 
-- handlers.c: __k1_do_interrupt_dame
-  - Do the same thing than __k1_do_hwtrap
+- handlers.c: `__k1_do_interrupt_dame`
+  - Do the same thing than `__k1_do_hwtrap`
 
-- handlers.c: __k1_do_debug
-  - Do the same thing than __k1_do_hwtrap
+- handlers.c: `__k1_do_debug`
+  - Do the same thing than `__k1_do_hwtrap`
 
-- handlers.c: __k1_do_scall
+- handlers.c: `__k1_do_scall`
   - syscall numbers are defined in libgloss/k1-elf/include/k1c/scall_no.h
   - only syscalls write and exit are managed.
   - syscall write (17) uses magic syscall 4094
