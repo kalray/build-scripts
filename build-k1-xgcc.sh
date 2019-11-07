@@ -64,7 +64,11 @@ cd -
 cd gcc
 
 ## This is used only when distribution does not have correct dependencies.
-##./contrib/download_prerequisites
+if [ -e /etc/os-release ] ; then
+  if $(grep -q "CentOS Linux 7" /etc/os-release) ; then 
+    ./contrib/download_prerequisites
+  fi
+fi
 
 cd -
 mkdir -p build-gcc
