@@ -10,13 +10,15 @@ Kalray provides source codes of gdb/binutils, gcc and newlib that contain our po
 
 To build this toolchain, you have to clone github repository  https://github.com/kalray/build-scripts that contains build script and references of others needed repositories.
 These references correspond to official Kalray's deliveries.
+They are named "4.0.0-cd4.refs", "4.0.0-cd5.refs", etc...
+The file "last.refs" points to the latest Kalray delivery.
 
-For example: You will get SHA1 references of GCC, gdb/binutils and newlib for official code drop 5 in file 4.0.0-cd5.refs on branch 4.0.0-cd5.
+For example: You will get SHA1 references of GCC, gdb/binutils and newlib for last official code drop in file last.refs.
 
 To build elf toolchain for this version:
 
 ```bash
-source ./4.0.0-cd5.refs
+source ./last.refs
 ./build-scripts/build-k1-xgcc.sh <prefix>
 ```
 Prefix is the path where toolchain will be installed.
