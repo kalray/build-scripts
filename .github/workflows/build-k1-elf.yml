@@ -1,0 +1,18 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install deps
+      run: sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev texinfo zlib1g-dev bison flex libtool
+    - name: Build
+      run: source last.refs && ./build-k1-xgcc.sh test-build
