@@ -2,6 +2,9 @@ name: CI
 
 on: [push]
 
+env:
+  release_package: gcc-kalray-${{ github.sha }}.tar.gz
+
 jobs:
   build:
     strategy:
@@ -9,10 +12,49 @@ jobs:
         os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
-    
+
     steps:
     - uses: actions/checkout@v1
     - name: Install deps
       run: sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev texinfo zlib1g-dev bison flex libtool
     - name: Build
       run: source last.refs && ./build-k1-xgcc.sh test-build
+    - name: Package
+      if: matrix.os == 'ubuntu-latest'
+      run: cd test-build/ && tar -cvzf ${{ env.release_package }} *
+    - name: Upload toolchain
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v1
+      with:
+        name: toolchain-package
+        path: test-build/${{ env.release_package }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Download toolchain from build
+      uses: actions/download-artifact@v1
+      with:
+        name: toolchain-package
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./toolchain-package/${{ env.release_package }}
+        asset_name: ${{ env.release_package }}
+        asset_content_type: application/gzip
