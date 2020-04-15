@@ -28,7 +28,7 @@ function git_clone() {
 	git fetch
 	cd -
     else
-	git clone --depth 1 -b coolidge ${repo}
+	git clone -b coolidge ${repo}
     fi
 
     if [[ ! -z "${sha1}" ]]
