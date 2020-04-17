@@ -1,0 +1,5 @@
+# Github sha1 for Code Drop 4.1.0-cd1
+# Source this file before executing build-k1-xgcc.sh to build this code drop
+export SHA1_GCC=f6f2785ba66afb5b80e17e5409060061781d7ee4
+export SHA1_GDB=3aacfa058a0fe41705f67f18a54b8da3733be4ad
+export SHA1_NEWLIB=bf737d4d0e0eb0df50ab6ecda7b48bde1dc1aea6
