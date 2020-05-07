@@ -36,6 +36,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+    - name: Check pre-release
+      id: get_prerelease
+      run: echo ::set-output name=PRERELEASE::$([[ $GITHUB_REF =~ .*-cd.* ]] && echo "true" || echo "false")
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -45,7 +48,7 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
         draft: false
-        prerelease: false
+        prerelease: ${{ steps.get_prerelease.outputs.PRERELEASE }}
     - name: Download toolchain from build
       uses: actions/download-artifact@v1
       with:
