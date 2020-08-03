@@ -21,7 +21,7 @@ jobs:
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
     - name: Build
-      run: source last.refs && ./build-k1-xgcc.sh gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
+      run: source last.refs && ./build-kvx-xgcc.sh gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
     - name: Package
       if: matrix.os == 'ubuntu-latest'
       run: tar -cvzf gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}

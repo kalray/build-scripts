@@ -21,4 +21,4 @@ jobs:
     - name: Install deps
       run: ./install-ubuntu-prereq.sh
     - name: Build
-      run: source last.refs && ./build-k1-xgcc.sh test-build
+      run: source last.refs && ./build-kvx-xgcc.sh test-build
