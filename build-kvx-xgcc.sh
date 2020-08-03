@@ -1,54 +1,53 @@
 #!/usr/bin/env bash
 set -eu
 
-DOWNLOAD_REQ=1
-
 ## Set these for using specific revision
 SHA1_GCC=${SHA1_GCC:-HEAD}
-SHA1_GDB=${SHA1_GDB:-HEAD}
+SHA1_BINUTILS=${SHA1_BINUTILS:-HEAD}
 SHA1_NEWLIB=${SHA1_NEWLIB:-HEAD}
 
 TARGET=${TARGET:-kvx-elf}
-PREFIX=$(realpath $1)
+PREFIX=$(realpath "$1")
 
 PARALLEL_JOBS=-j6
 
 
-mkdir -p $PREFIX
-export PATH=$PREFIX/bin:$PATH
+mkdir -p "$PREFIX"
+export PATH="$PREFIX/bin:$PATH"
 
 function git_clone() {
     local repo=$1
     local sha1=$2
 
-    repo_dir=$(basename ${repo} ".git")
+    repo_dir=$(basename "${repo}" ".git")
     echo "Cloning ${repo} (${repo_dir}) sha1: ${sha1}"
-    if [ -d ${repo_dir} ]; then
-	cd ${repo_dir}
-	git fetch
-	cd -
+    if [ -d "${repo_dir}" ]; then
+        (
+            cd "${repo_dir}"
+            git fetch
+        )
     else
-	git clone -b coolidge ${repo}
+	      git clone -b coolidge "${repo}"
     fi
 
     if [[ ! -z "${sha1}" ]]
     then
-	cd ${repo_dir}
-	git reset --hard ${sha1}
-	cd -
+        (
+            cd "${repo_dir}"
+            git reset --hard "${sha1}"
+        )
     fi
 }
 
-git_clone https://github.com/kalray/gdb-binutils.git ${SHA1_GDB}
-git_clone https://github.com/kalray/newlib.git ${SHA1_NEWLIB}
-git_clone https://github.com/kalray/gcc.git ${SHA1_GCC}
-
+git_clone https://github.com/kalray/gdb-binutils.git "${SHA1_BINUTILS}"
+git_clone https://github.com/kalray/newlib.git "${SHA1_NEWLIB}"
+git_clone https://github.com/kalray/gcc.git "${SHA1_GCC}"
 
 mkdir -p build-binutils
-cd build-binutils
+pushd build-binutils
 ../gdb-binutils/configure \
-    --prefix=$PREFIX \
-    --target=$TARGET \
+    --prefix="$PREFIX" \
+    --target="$TARGET" \
     --disable-initfini-array  \
     --disable-gdb \
     --without-gdb \
@@ -57,25 +56,25 @@ cd build-binutils
     --with-babeltrace=no \
     --with-bugurl=no
 
-make all $PARALLEL_JOBS > /dev/null
+make all "$PARALLEL_JOBS" > /dev/null
 make install
+popd
 
-cd -
-cd gcc
+pushd gcc
 
 ## This is used only when distribution does not have correct dependencies.
 if [ -e /etc/os-release ] ; then
-  if $(grep -q "CentOS Linux 7" /etc/os-release) ; then 
-    ./contrib/download_prerequisites
-  fi
+    if grep -q "CentOS Linux 7" /etc/os-release; then
+        ./contrib/download_prerequisites
+    fi
 fi
+popd
 
-cd -
 mkdir -p build-gcc
-cd build-gcc
+pushd build-gcc
 ../gcc/configure \
-    --prefix=$PREFIX \
-    --target=$TARGET  \
+    --prefix="$PREFIX" \
+    --target="$TARGET"  \
     --with-gnu-as \
     --with-gnu-ld \
     --disable-bootstrap \
@@ -92,27 +91,29 @@ cd build-gcc
     --enable-languages=c,c++ \
     --with-system-zlib
 
-make all-gcc $PARALLEL_JOBS > /dev/null
+make all-gcc "$PARALLEL_JOBS" > /dev/null
 make install-gcc
+popd
 
-cd -
 mkdir -p build-newlib
-cd  build-newlib
+pushd build-newlib
 ../newlib/configure \
-    --target=$TARGET \
-    --prefix=$PREFIX \
+    --target="$TARGET" \
+    --prefix="$PREFIX" \
     --enable-multilib \
     --enable-target-optspace \
     --enable-newlib-io-c99-formats \
-    --target=${TARGET} \
+    --target="${TARGET}" \
     --enable-newlib-multithread
 
-make all $PARALLEL_JOBS > /dev/null
+make all "$PARALLEL_JOBS" > /dev/null
 make install
+popd
 
-cd -
-cd build-gcc
-make all $PARALLEL_JOBS > /dev/null
+pushd build-gcc
+make all "$PARALLEL_JOBS" > /dev/null
 make install
+popd
 
 echo "Finished"
+

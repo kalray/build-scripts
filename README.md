@@ -19,7 +19,7 @@ To build elf toolchain for this version:
 
 ```bash
 source ./last.refs
-./build-scripts/build-k1-xgcc.sh <prefix>
+./build-scripts/build-kvx-xgcc.sh <prefix>
 ```
 Prefix is the path where toolchain will be installed.
 
@@ -71,13 +71,13 @@ index 5a728e8..bc919fa 100755
 
 https://github.com/kalray/gcc
 
-To make OS specific toolchain, it is possible to modify gcc driver to get k1-<os>-gcc. This driver will be able to link specific OS librairies for example.
+To make OS specific toolchain, it is possible to modify gcc driver to get kvx-<os>-gcc. This driver will be able to link specific OS librairies for example.
 First of all, GCC internal documentation can be found here: https://gcc.gnu.org/onlinedocs/gccint
 
-K1 is the Kalray's processor name. Main k1 specific targetting files are here:
+KVX is the Kalray's processor familly name. Main KVX specific targetting files are here:
 
 ```
-gcc/config/k1/
+gcc/config/kvx/
 ```
 It targets several toolchain versions:
 - elf
@@ -86,17 +86,17 @@ It targets several toolchain versions:
 - linux
 
 Files that configure gcc's driver for elf toolchain:
-- k1-elf.h
-- k1.opt
+- kvx-elf.h
+- kvx.opt
 - t-elf
-- t-k1
+- t-kvx
 
 These files are used in gcc/config.gcc:
 
 ```bash
-k1-*-elf*)
-	tm_file="${tm_file} elfos.h dbxelf.h k1/k1-elf.h newlib-stdint.h"
-	tmake_file="k1/t-k1 k1/t-elf"
+kvx-*-elf*)
+	tm_file="${tm_file} elfos.h dbxelf.h kvx/kvx-elf.h newlib-stdint.h"
+	tmake_file="kvx/t-kvx kvx/t-elf"
 	;;
 ```
 
@@ -118,11 +118,11 @@ index 7fabc3d..70595a5 100755
                 ;;
         -qnx*)
 ```
-- create k1-freertos.h from k1-elf.h. For FreeRTOS:
+- create kvx-freertos.h from kvx-elf.h. For FreeRTOS:
 ```c
-cat gcc/config/k1/k1-freertos.h
-/* Machine description for K1 MPPA architecture.
-   Copyright (C) 2018 Kalray Inc.
+cat gcc/config/kvx/kvx-freertos.h
+/* Machine description for KVX MPPA architecture familly.
+   Copyright (C) 2020 Kalray Inc.
 
    This file is part of GCC.
 
@@ -140,8 +140,8 @@ cat gcc/config/k1/k1-freertos.h
    along with GCC; see the file COPYING3.  If not see
    <http://www.gnu.org/licenses/>.  */
 
-#ifndef GCC_K1_MPPA_FREERTOS
-#define GCC_K1_MPPA_FREERTOS
+#ifndef GCC_KVX_MPPA_FREERTOS
+#define GCC_KVX_MPPA_FREERTOS
 
 #define STARTFILE_SPEC " crti%O%s crtbegin%O%s crt0%O%s"
 #define ENDFILE_SPEC " crtend%O%s crtn%O%s"
@@ -161,26 +161,26 @@ cat gcc/config/k1/k1-freertos.h
 #define LINK_SPEC \
   LINK_SPEC_COMMON
 
-#endif /* GCC_K1_MPPA_FREERTOS */
+#endif /* GCC_KVX_MPPA_FREERTOS */
 ```
 
 - create t-freertos from t-elf. Example for FreeRTOS:
 ```
-cat ./gcc/config/k1/t-freertos
+cat ./gcc/config/kvx/t-freertos
 MULTILIB_OPTIONS = fno-exceptions
 MULTILIB_DIRNAMES = noexceptions
 ```
 - add configuration line in gcc/config.gcc for freeRTOS:
 ```bash
-k1-*-freertos*)
-	tm_file="${tm_file} elfos.h dbxelf.h k1/k1-freertos.h newlib-stdint.h"
-	tmake_file="k1/t-k1 k1/t-freertos"
+kvx-*-freertos*)
+	tm_file="${tm_file} elfos.h dbxelf.h kvx/kvx-freertos.h newlib-stdint.h"
+	tmake_file="kvx/t-kvx kvx/t-freertos"
 	;;
 ```
 
 ### Newlib (libc)
 
-Equivalent to board support package of Newlib is in newlib/libgloss/k1-elf for Elf toolchain.
+Equivalent to board support package of Newlib is in newlib/libgloss/kvx-elf for Elf toolchain.
 It contains support for:
 - boot: start.S, boot_c.c, boot_args.c, crt0.c, crti.c and crtn.c
 - bsp: bsp.c, exceptions.c exceptions_pl0.c, handlers.c, syscall.c, context.c and diagnostic.c
@@ -205,8 +205,8 @@ index 7c526fb..54ab48d 100755
         -qnx*)
 ```
 - FreeRTOS libgloss:
- - copy all libgloss/k1-elf directory to libgloss/k1-freertos
- - Defines k1-freertos in libgloss/configure.in:
+ - copy all libgloss/kvx-elf directory to libgloss/kvx-freertos
+ - Defines kvx-freertos in libgloss/configure.in:
 
 ```diff
 git diff ./configure.in
@@ -215,11 +215,11 @@ index 61eda97..13df055 100644
 --- a/libgloss/configure.in
 +++ b/libgloss/configure.in
 @@ -126,6 +126,10 @@ case "${target}" in
-        AC_CONFIG_SUBDIRS([k1-cos])
+        AC_CONFIG_SUBDIRS([kvx-cos])
         config_libnosys=false
         ;;
-+  k1*-*-freertos)
-+       AC_CONFIG_SUBDIRS([k1-freertos])
++  kvx*-*-freertos)
++       AC_CONFIG_SUBDIRS([kvx-freertos])
 +       config_libnosys=false
 +       ;;
    lm32*-*-*)
@@ -236,18 +236,18 @@ RM core in each cluster is normally dedicated to firmware: management of L2 cach
 So boot is done on RM to initialize cluster memory mapped registers for L2 cache, APIC, GIC and MAILBOX.
 
 **RM boot sequence**:
-- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__k1_rm_c_startup`
-- boot_c.c: `__k1_rm_c_startup`: 
+- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__kvx_rm_c_startup`
+- boot_c.c: `__kvx_rm_c_startup`: 
 ```c
-void __k1_rm_c_startup(void)
+void __kvx_rm_c_startup(void)
 {
-  __k1_low_level_startup();
-  __k1_rm_init();
-  __k1_do_rm_startup();
-  __k1_stop();
+  __kvx_low_level_startup();
+  __kvx_rm_init();
+  __kvx_do_rm_startup();
+  __kvx_stop();
 }
 ```
-- boot_c.c: `__k1_low_level_startup`
+- boot_c.c: `__kvx_low_level_startup`
   - init of exception vector (SFR:EV)
   - enable icache, dcache, streaming load, hardware loop
   - init of interupts, DAME (Data Asynchronous Memory Error)
@@ -255,97 +255,97 @@ void __k1_rm_c_startup(void)
   - enable L1 cache coherency
   - init of power controller
 
-- boot_c.c: `__k1_rm_init`
+- boot_c.c: `__kvx_rm_init`
   - TLS and BSS sections init
 
-- boot_c.c: `__k1_do_rm_startup`
-  - call of `__k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)`
+- boot_c.c: `__kvx_do_rm_startup`
+  - call of `__kvx_start_pe(PE0, __kvx_pe_libc_start, __kvx_libc_args, KVX_PE_STACK_START)`
 
-- boot_c.c: `__k1_start_pe`
-  - init of `_K1_PE_START_ADDRESS`: address of startup routine to call at boot time
-  - init of `_K1_PE_ARGS_ADDRESS`: address of `k1_boot_args_t` structure to pass `argc`, `argv` and `envp`
-  - init of `_K1_PE_STACK_ADDRESS`: PE0 stack start address
+- boot_c.c: `__kvx_start_pe`
+  - init of `_KVX_PE_START_ADDRESS`: address of startup routine to call at boot time
+  - init of `_KVX_PE_ARGS_ADDRESS`: address of `kvx_boot_args_t` structure to pass `argc`, `argv` and `envp`
+  - init of `_KVX_PE_STACK_ADDRESS`: PE0 stack start address
   - wakeup PE0 using power controller
 
-- boot_c.c: `__k1_stop`
+- boot_c.c: `__kvx_stop`
   - set RM in IDLE mode
 
 **PE0 boot sequence**:
 
-- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__k1_pe_libc_start` previously given during RM boot.
+- start.S: `_start`: core 64 bits mode, setting of the stack pointer and call of `__kvx_pe_libc_start` previously given during RM boot.
 
-- boot_c.c: `__k1_pe_c_startup`: 
+- boot_c.c: `__kvx_pe_c_startup`: 
 ```c
-void __k1_pe_c_startup(void)
+void __kvx_pe_c_startup(void)
 {
-  __k1_low_level_startup();
-  __k1_do_pe_startup();
-  __k1_stop();
+  __kvx_low_level_startup();
+  __kvx_do_pe_startup();
+  __kvx_stop();
 }
 ```
-- boot_c.c: `__k1_low_level_startup`
+- boot_c.c: `__kvx_low_level_startup`
   - init of exception vector (SFR:EV)
   - enable icache, dcache, streaming load, hardware loop
   - init of interupts, DAME (Data Asynchronous Memory Error)
   - enable L1 cache coherency
   - init of power controller
 
-- boot_c.c: `__k1_do_pe_startup`
-  - `__k1_pe_init`: init of sections TLS and BSS
-  - `__k1_finish_newlib_init`: some libc internal init for reentrance
-  - register `__k1_newlib_flushall` at exit to flush mainly IO streams at exit.
+- boot_c.c: `__kvx_do_pe_startup`
+  - `__kvx_pe_init`: init of sections TLS and BSS
+  - `__kvx_finish_newlib_init`: some libc internal init for reentrance
+  - register `__kvx_newlib_flushall` at exit to flush mainly IO streams at exit.
   - call main routine
   - call exit
   - while(1)
 
-- boot_c.c: `__k1_do_rm_startup`
-  - call of `__k1_start_pe(PE0, __k1_pe_libc_start, __k1_libc_args, K1_PE_STACK_START)`
+- boot_c.c: `__kvx_do_rm_startup`
+  - call of `__kvx_start_pe(PE0, __kvx_pe_libc_start, __kvx_libc_args, KVX_PE_STACK_START)`
 
-- boot_c.c: `__k1_start_pe`
-  - init of `_K1_PE_START_ADDRESS`: address of startup routine to call at boot time
-  - init of `_K1_PE_ARGS_ADDRESS`: address of k1_boot_args_t structure to pass argc, argv and envp
-  - init of `_K1_PE_STACK_ADDRESS`: PE0 stack start address
+- boot_c.c: `__kvx_start_pe`
+  - init of `_KVX_PE_START_ADDRESS`: address of startup routine to call at boot time
+  - init of `_KVX_PE_ARGS_ADDRESS`: address of kvx_boot_args_t structure to pass argc, argv and envp
+  - init of `_KVX_PE_STACK_ADDRESS`: PE0 stack start address
   - wakeup PE0 using power controller
 
-- boot_c.c: `__k1_stop`
+- boot_c.c: `__kvx_stop`
   - set RM in IDLE mode
 
 ## Exceptions handling
 
-K1 core has an Exception Vector register to initialize with a vector of 4 trampolines of maximum size 0x40 bytes:
+KVX cores have an Exception Vector register to initialize with a vector of 4 trampolines of maximum size 0x40 bytes:
 - DEBUG
 - TRAP
 - INTERRUPT
 - SYSCALL
 
-At boot time, `SFR[EV]` is initialized to `K1_EXCEPTION_ADDRESS` initialized by default in bare.ld linker script:
+At boot time, `SFR[EV]` is initialized to `KVX_EXCEPTION_ADDRESS` initialized by default in bare.ld linker script:
 
 ```c
-K1_EXCEPTION_ADDRESS = DEFINED(K1_EXCEPTION_ADDRESS) ? K1_EXCEPTION_ADDRESS : 0x400;
-K1_DEBUG_ADDRESS     = K1_EXCEPTION_ADDRESS + 0x00;
-K1_TRAP_ADDRESS      = K1_EXCEPTION_ADDRESS + 0x40;
-K1_INTERRUPT_ADDRESS = K1_EXCEPTION_ADDRESS + 0x80;
-K1_SYSCALL_ADDRESS   = K1_EXCEPTION_ADDRESS + 0xc0;
+KVX_EXCEPTION_ADDRESS = DEFINED(KVX_EXCEPTION_ADDRESS) ? KVX_EXCEPTION_ADDRESS : 0x400;
+KVX_DEBUG_ADDRESS     = KVX_EXCEPTION_ADDRESS + 0x00;
+KVX_TRAP_ADDRESS      = KVX_EXCEPTION_ADDRESS + 0x40;
+KVX_INTERRUPT_ADDRESS = KVX_EXCEPTION_ADDRESS + 0x80;
+KVX_SYSCALL_ADDRESS   = KVX_EXCEPTION_ADDRESS + 0xc0;
 ```
 Each address is used to init specific sections address in bare.ld linker script:
 
 ```c
-  .exception.debug K1_DEBUG_ADDRESS : {
+  .exception.debug KVX_DEBUG_ADDRESS : {
     /* The debug exception handler */
     KEEP(*(.exception.debug))
   } > internal_mem
 
-  .exception.trap K1_TRAP_ADDRESS : {
+  .exception.trap KVX_TRAP_ADDRESS : {
     /* The debug exception handler */
     KEEP(*(.exception.trap))
   } > internal_mem
 
-  .exception.interrupt K1_INTERRUPT_ADDRESS : {
+  .exception.interrupt KVX_INTERRUPT_ADDRESS : {
     /* The debug exception handler */
     KEEP(*(.exception.interrupt))
   } > internal_mem
 
-  .exception.syscall K1_SYSCALL_ADDRESS : {
+  .exception.syscall KVX_SYSCALL_ADDRESS : {
     /* The debug exception handler */
     KEEP(*(.exception.syscall))
   } > internal_mem
@@ -356,59 +356,59 @@ All exception trampolines are defined in start.S:
 
 ```
 	.section .exception.debug, "ax", @progbits
-	.globl k1c_debug_handler_trampoline
-	.proc k1c_debug_handler_trampoline
-k1c_debug_handler_trampoline:
-	goto __k1_asm_exceptions_handler
+	.globl kv3_debug_handler_trampoline
+	.proc kv3_debug_handler_trampoline
+kv3_debug_handler_trampoline:
+	goto __kvx_asm_exceptions_handler
 	;;
-	.endp k1c_debug_handler_trampoline
+	.endp kv3_debug_handler_trampoline
 
 	.section .exception.trap, "ax", @progbits
-	.globl k1c_trap_handler_trampoline
-	.proc k1c_trap_handler_trampoline
-k1c_trap_handler_trampoline:
-	goto __k1_asm_exceptions_handler
+	.globl kv3_trap_handler_trampoline
+	.proc kv3_trap_handler_trampoline
+kv3_trap_handler_trampoline:
+	goto __kvx_asm_exceptions_handler
 	;;
-	.endp k1c_trap_handler_trampoline
+	.endp kv3_trap_handler_trampoline
 
 	.section .exception.interrupt, "ax", @progbits
-	.globl k1c_interrupt_handler_trampoline 
-	.proc k1c_interrupt_handler_trampoline
-k1c_interrupt_handler_trampoline:
-	goto __k1_asm_exceptions_handler
+	.globl kv3_interrupt_handler_trampoline 
+	.proc kv3_interrupt_handler_trampoline
+kv3_interrupt_handler_trampoline:
+	goto __kvx_asm_exceptions_handler
 	;;
-	.endp k1c_interrupt_handler_trampoline
+	.endp kv3_interrupt_handler_trampoline
 
 	.section .exception.syscall, "ax", @progbits ;\
-	.globl k1c_syscall_handler_trampoline ;\
-	.proc k1c_syscall_handler_trampoline
-k1c_syscall_handler_trampoline:
-	goto __k1_asm_exceptions_handler
+	.globl kv3_syscall_handler_trampoline ;\
+	.proc kv3_syscall_handler_trampoline
+kv3_syscall_handler_trampoline:
+	goto __kvx_asm_exceptions_handler
 	;;
-	.endp k1c_syscall_handler_trampoline
+	.endp kv3_syscall_handler_trampoline
 ```
 
-- exceptions.S: `__k1_asm_exceptions_handler`
+- exceptions.S: `__kvx_asm_exceptions_handler`
   - Save context
   - Call corresponding exception handler depending on SFR[EC] (Exception Cause)
-  - Each exception handler call corresponding `__k1_do_<exception type>`
+  - Each exception handler call corresponding `__kvx_do_<exception type>`
   - Restore context
 
-- handlers.c: `__k1_do_hwtrap`
+- handlers.c: `__kvx_do_hwtrap`
   - if write is defined, print error message and exit with 1 as error code
   - cluster power off
 
-- handlers.c: `__k1_do_interrupt`
-  - if `__k1_int_handlers[<it number>]` is registered, call it
+- handlers.c: `__kvx_do_interrupt`
+  - if `__kvx_int_handlers[<it number>]` is registered, call it
 
-- handlers.c: `__k1_do_interrupt_dame`
-  - Do the same thing than `__k1_do_hwtrap`
+- handlers.c: `__kvx_do_interrupt_dame`
+  - Do the same thing than `__kvx_do_hwtrap`
 
-- handlers.c: `__k1_do_debug`
-  - Do the same thing than `__k1_do_hwtrap`
+- handlers.c: `__kvx_do_debug`
+  - Do the same thing than `__kvx_do_hwtrap`
 
-- handlers.c: `__k1_do_scall`
-  - syscall numbers are defined in libgloss/k1-elf/include/k1c/scall_no.h
+- handlers.c: `__kvx_do_scall`
+  - syscall numbers are defined in libgloss/kvx-elf/include/kv3/scall_no.h
   - only syscalls write and exit are managed.
   - syscall write (17) uses magic syscall 4094
   - syscall exit (1) uses magic syscall 4095.
@@ -416,5 +416,5 @@ k1c_syscall_handler_trampoline:
 ## Lock handling
 
 OS must provides some lock interface that must be used by libc.
-For elf toolchain, locks are defined in ./newlib/libc/sys/k1/lock.c.
+For elf toolchain, locks are defined in ./newlib/libc/sys/kvx/lock.c.
 As example, ClusterOS provides its locks api used in ./newlib/libc/sys/cos/lock.c.

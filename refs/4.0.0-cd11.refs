@@ -1,6 +1,6 @@
 # Github sha1 for Code Drop 4.0.0-cd11
-# Source this file before executing build-k1-xgcc.sh to build code drop 4.0.0-cd11
+# Source this file before executing build-kvx-xgcc.sh to build code drop 4.0.0-cd11
 export SHA1_GCC=2e74d3fe9dd538da128f4775e6047e0db7458927
-export SHA1_GDB=329a393af55b79626c87e65dbe36863ff22b6e93
+export SHA1_BINUTILS=329a393af55b79626c87e65dbe36863ff22b6e93
 export SHA1_NEWLIB=f6f75c0554cd088874d6c8931a48638875b7adad
 export TARGET=k1-elf
