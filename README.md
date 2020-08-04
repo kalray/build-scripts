@@ -74,7 +74,7 @@ https://github.com/kalray/gcc
 To make OS specific toolchain, it is possible to modify gcc driver to get kvx-<os>-gcc. This driver will be able to link specific OS librairies for example.
 First of all, GCC internal documentation can be found here: https://gcc.gnu.org/onlinedocs/gccint
 
-KVX is the Kalray's processor familly name. Main KVX specific targetting files are here:
+KVX is the Kalray's processor family name. Main KVX specific targetting files are here:
 
 ```
 gcc/config/kvx/
@@ -121,7 +121,7 @@ index 7fabc3d..70595a5 100755
 - create kvx-freertos.h from kvx-elf.h. For FreeRTOS:
 ```c
 cat gcc/config/kvx/kvx-freertos.h
-/* Machine description for KVX MPPA architecture familly.
+/* Machine description for KVX MPPA architecture family.
    Copyright (C) 2020 Kalray Inc.
 
    This file is part of GCC.
