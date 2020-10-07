@@ -1,0 +1,5 @@
+# Github sha1 for Release candidate 4.2.0-rc5
+# Source this file before executing build-k1-xgcc.sh to build this code drop
+export SHA1_GCC=ce66b3c7a9489652641b4aa2cde518d911454d3c
+export SHA1_BINUTILS=144146ebd565aa289a0c2f6ffd16196ac92f34d0
+export SHA1_NEWLIB=2d5032dcb443c4890a0354d74f789df333d2c40f
