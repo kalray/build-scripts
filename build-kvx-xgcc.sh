@@ -18,6 +18,14 @@ export PATH="$PREFIX/bin:$PATH"
 function git_clone() {
     local repo=$1
     local sha1=$2
+    local branch=$3
+
+    if [[ "${branch}" == "-" ]];
+    then
+        branch=""
+    else
+        branch="-b ${branch}"
+    fi
 
     repo_dir=$(basename "${repo}" ".git")
     echo "Cloning ${repo} (${repo_dir}) sha1: ${sha1}"
@@ -27,7 +35,7 @@ function git_clone() {
             git fetch
         )
     else
-	      git clone -b coolidge "${repo}"
+	      git clone ${branch} "${repo}"
     fi
 
     if [[ ! -z "${sha1}" ]]
@@ -39,9 +47,9 @@ function git_clone() {
     fi
 }
 
-git_clone https://github.com/kalray/gdb-binutils.git "${SHA1_BINUTILS}"
-git_clone https://github.com/kalray/newlib.git "${SHA1_NEWLIB}"
-git_clone https://github.com/kalray/gcc.git "${SHA1_GCC}"
+git_clone https://github.com/kalray/gdb-binutils.git "${SHA1_BINUTILS}" -
+git_clone https://github.com/kalray/newlib.git "${SHA1_NEWLIB}" coolidge
+git_clone https://github.com/kalray/gcc.git "${SHA1_GCC}" coolidge
 
 mkdir -p build-binutils
 pushd build-binutils
