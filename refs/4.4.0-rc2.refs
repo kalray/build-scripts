@@ -1,0 +1,5 @@
+ Github sha1 for release candidate 4.4.0-rc2
+# Source this file before executing build-kvx-xgcc.sh to build this code drop
+export SHA1_GCC=a1965e205203acdaa36533625e8c7d6b480fff2b
+export SHA1_BINUTILS=0e423f2e2262e2f3573ffe98e337bad64e275e1e
+export SHA1_NEWLIB=0f5eec078546ab8a0f7e68fd4a32fd1657c2ade4
