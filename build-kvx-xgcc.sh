@@ -111,7 +111,6 @@ pushd build-newlib
     --enable-multilib \
     --enable-target-optspace \
     --enable-newlib-io-c99-formats \
-    --target="${TARGET}" \
     --enable-newlib-multithread
 
 make all "$PARALLEL_JOBS" > /dev/null
