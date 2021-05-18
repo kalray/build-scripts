@@ -1,0 +1,68 @@
+name: Release LLVM
+
+on:
+  push:
+    tags:
+      - llvm-v*
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install deps
+      run: ./install-ubuntu-prereq.sh
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Build
+      run: source last.refs && ./build-kvx-llvm.sh llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
+    - name: Package
+      if: matrix.os == 'ubuntu-latest'
+      run: tar -cvzf llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
+    - name: Upload toolchain
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v1
+      with:
+        name: toolchain-package
+        path: ./llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check pre-release
+      id: get_prerelease
+      run: echo ::set-output name=PRERELEASE::$([[ $GITHUB_REF =~ .*-cd.* ]] && echo "true" || echo "false")
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: ${{ steps.get_prerelease.outputs.PRERELEASE }}
+    - name: Download toolchain from build
+      uses: actions/download-artifact@v1
+      with:
+        name: toolchain-package
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./toolchain-package/llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        asset_name: llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        asset_content_type: application/gzip
