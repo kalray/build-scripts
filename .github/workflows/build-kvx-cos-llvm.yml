@@ -2,8 +2,10 @@ name: CI LLVM
 
 on:
   push:
-    tags:
-      - llvm-v*
+    branches:
+      - '**'
+    tags-ignore:
+      - v*
 
 jobs:
   build:
