@@ -3,7 +3,7 @@ name: Release LLVM
 on:
   push:
     tags:
-      - v*
+      - llvm-v*
 
 jobs:
   build:
