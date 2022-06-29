@@ -47,13 +47,13 @@ function git_clone() {
     fi
 }
 
-git_clone https://github.com/kalray/gdb-binutils.git "${SHA1_BINUTILS}" -
+git_clone https://github.com/kalray/binutils.git "${SHA1_BINUTILS}" -
 git_clone https://github.com/kalray/newlib.git "${SHA1_NEWLIB}" coolidge
 git_clone https://github.com/kalray/gcc.git "${SHA1_GCC}" coolidge
 
 mkdir -p build-binutils
 pushd build-binutils
-../gdb-binutils/configure \
+../binutils/configure \
     --prefix="$PREFIX" \
     --target="$TARGET" \
     --disable-initfini-array  \

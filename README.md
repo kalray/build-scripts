@@ -2,18 +2,18 @@
 
 # Welcome to OS porting guide
 
-This guide should give you some information about porting newlib, gdb/binutils and gcc to make new OS aware toolchain.
+This guide should give you some information about porting newlib, binutils and gcc to make new OS aware toolchain.
 
 ## How to build existing elf (bare) toolchain
 
-Kalray provides source codes of gdb/binutils, gcc and newlib that contain our port of Kalray's MPPA Coolidge core.
+Kalray provides source codes of binutils, gcc and newlib that contain our port of Kalray's MPPA Coolidge core.
 
 To build this toolchain, you have to clone github repository  https://github.com/kalray/build-scripts that contains build script and references of others needed repositories.
 These references correspond to official Kalray's deliveries.
 They are located in refs/ directory and named "4.0.0-cd9.refs", "4.0.0-cd10.refs", etc...
 The file "last.refs" in the top directory points to the latest Kalray delivery.
 
-For example: You will get SHA1 references of GCC, gdb/binutils and newlib for last official code drop in file last.refs.
+For example: You will get SHA1 references of GCC, binutils and newlib for last official code drop in file last.refs.
 
 To build elf toolchain for this version:
 
