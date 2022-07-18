@@ -50,6 +50,7 @@ sed -i -e "s/BR2_UCLIBC_VERSION=.*/BR2_UCLIBC_VERSION=${SHA1_UCLIBC}/" build_kvx
 # Append to hash files
 echo "sha512 ${HASH_GCC} gcc-${SHA1_GCC}.tar.gz" >> package/gcc/gcc.hash
 echo "sha512 ${HASH_GDB} gdb-${SHA1_GDB}.tar.gz" >> package/gdb/gdb.hash
+echo "sha512 ${HASH_BINUTILS} binutils-${SHA1_BINUTILS}.tar.gz" >> package/binutils/binutils.hash
 
 cd build_kvx
 make
