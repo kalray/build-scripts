@@ -34,7 +34,7 @@ function git_clone() {
     fi
 }
 
-git_clone https://github.com/kalray/buildroot.git "${SHA1_BUILDROOT}" coolidge
+git_clone https://github.com/kalray/buildroot.git "${SHA1_BUILDROOT}" coolidge-for-upstream
 git_clone https://github.com/kalray/br2_external_coolidge "${SHA1_BR2_EXTERNAL}" coolidge
 
 BR2_EXTERNAL_PATH=${PWD}/br2_external_coolidge
