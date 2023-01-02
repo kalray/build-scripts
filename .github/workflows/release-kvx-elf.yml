@@ -9,12 +9,12 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest]
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Install deps
       run: ./install-ubuntu-prereq.sh
     - name: Get the version
@@ -23,14 +23,12 @@ jobs:
     - name: Build
       run: source last.refs && ./build-kvx-xgcc.sh gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
     - name: Package
-      if: matrix.os == 'ubuntu-latest'
-      run: tar -cvzf gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
+      run: tar -cvzf gcc-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}
     - name: Upload toolchain
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
-        name: toolchain-package
-        path: ./gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        name: toolchain-package-${{ matrix.os }}
+        path: ./gcc-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz
 
   release:
     needs: build
@@ -49,10 +47,18 @@ jobs:
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: ${{ steps.get_prerelease.outputs.PRERELEASE }}
+
+  deploy:
+    needs: release
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
     - name: Download toolchain from build
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v3
       with:
-        name: toolchain-package
+        name: toolchain-package-${{ matrix.os }}
     - name: Get the version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
@@ -63,6 +69,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./toolchain-package/gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
-        asset_name: gcc-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        asset_path: ./toolchain-package/gcc-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        asset_name: gcc-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz
         asset_content_type: application/gzip
