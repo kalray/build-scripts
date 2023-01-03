@@ -33,6 +33,8 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Check pre-release
       id: get_prerelease
@@ -68,7 +70,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./toolchain-package/llvm-kalray-kvx-${{ steps.get_version.outputs.VERSION }}.tar.gz
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: llvm-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz
         asset_name: llvm-kalray-kvx-${{ matrix.os }}-${{ steps.get_version.outputs.VERSION }}.tar.gz
         asset_content_type: application/gzip
