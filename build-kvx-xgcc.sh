@@ -65,7 +65,7 @@ pushd build-binutils
     --with-bugurl=no
 
 make all "$PARALLEL_JOBS" > /dev/null
-make install
+make install-strip
 popd
 
 pushd gcc
@@ -100,7 +100,7 @@ pushd build-gcc
     --with-system-zlib
 
 make all-gcc "$PARALLEL_JOBS" > /dev/null
-make install-gcc
+make install-strip-gcc
 popd
 
 mkdir -p build-newlib
@@ -119,7 +119,7 @@ popd
 
 pushd build-gcc
 make all "$PARALLEL_JOBS" > /dev/null
-make install
+make install-strip
 popd
 
 echo "Finished"
