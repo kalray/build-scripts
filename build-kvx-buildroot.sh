@@ -2,10 +2,23 @@
 set -eu
 unset PERL_MM_OPT
 
+DO_GIT_ARCHIVE=$1
+
 function git_clone() {
     local repo=$1
     local sha1=$2
     local branch=$3
+
+    if [[ ! -z "${DO_GIT_ARCHIVE}" ]];
+    then
+	repo_name=${repo##*/}
+	rm -rf ${repo_name}
+        wget ${repo}/archive/${sha1}.zip
+	unzip ${sha1}.zip
+	rm ${sha1}.zip
+	mv ${repo_name}-${sha1} ${repo_name}
+        return
+    fi
 
     if [[ "${branch}" == "-" ]];
     then
@@ -34,7 +47,7 @@ function git_clone() {
     fi
 }
 
-git_clone https://github.com/kalray/buildroot.git "${SHA1_BUILDROOT}" main
+git_clone https://github.com/kalray/buildroot "${SHA1_BUILDROOT}" main
 git_clone https://github.com/kalray/linux_coolidge "${SHA1_LINUX}" main
 git_clone https://github.com/kalray/uclibc-ng "${SHA1_UCLIBC}" main
 git_clone https://github.com/kalray/musl "${SHA1_MUSL}" main
