@@ -53,7 +53,7 @@ git_clone https://github.com/kalray/gcc.git "${SHA1_GCC}" coolidge
 
 mkdir -p build-binutils
 pushd build-binutils
-../binutils/configure \
+$PWD/../binutils/configure \
     --prefix="$PREFIX" \
     --target="$TARGET" \
     --disable-initfini-array  \
@@ -80,7 +80,7 @@ popd
 
 mkdir -p build-gcc
 pushd build-gcc
-../gcc/configure \
+$PWD/../gcc/configure \
     --prefix="$PREFIX" \
     --target="$TARGET"  \
     --with-gnu-as \
@@ -105,7 +105,7 @@ popd
 
 mkdir -p build-newlib
 pushd build-newlib
-../newlib/configure \
+$PWD/../newlib/configure \
     --target="$TARGET" \
     --prefix="$PREFIX" \
     --enable-multilib \
